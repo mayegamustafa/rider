@@ -307,12 +307,17 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                     hintText: S.of(context).selectVehicleType,
                                   ),
                                   icon: SvgPicture.asset(Assets.svgs.downArrow),
-                                  items: ["bike1", "car", "truck"]
-                                      .map((e) => DropdownMenuItem(
-                                            value: e,
-                                            child: Text(e),
-                                          ))
-                                      .toList(),
+                                  items: [
+                                    "bodaboda",
+                                    "taxi",
+                                    "lorry",
+                                    "bus",
+                                    "bicycle"
+                                  ].map((e) => DropdownMenuItem(
+                                        value: e,
+                                        child: Text(e.toUpperCase()),
+                                      ))
+                                  .toList(),
                                   validator: FormBuilderValidators.compose([
                                     FormBuilderValidators.required(),
                                   ]),
@@ -525,15 +530,26 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                   phone: data["phone"], isForgetPass: false)
                               .then((value) async {
                             if (value != null) {
-                              context.nav.pushNamed(
-                                Routes.confirmOTP,
-                                arguments: ConfirmOTPScreenArguments(
-                                  phoneNumber: data["phone"],
-                                  isPasswordRecover: false,
-                                  userData: data,
-                                  otp: value,
-                                ),
-                              );
+                              if (context.mounted) {
+                                await context.nav.pushNamed(
+                                  Routes.confirmOTP,
+                                  arguments: ConfirmOTPScreenArguments(
+                                    phoneNumber: data["phone"],
+                                    isPasswordRecover: false,
+                                    userData: data,
+                                    otp: value,
+                                  ),
+                                );
+                              }
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Failed to send OTP. Please try again.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
                             }
                           });
                         } else {

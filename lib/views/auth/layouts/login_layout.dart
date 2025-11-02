@@ -180,23 +180,45 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
                       onTap: () {
                         if (_formKey.currentState!.saveAndValidate()) {
                           final formData = _formKey.currentState!.value;
-                          ref
-                              .read(loginProvider.notifier)
-                              .login(
-                                phone: formData['phone'],
-                                password: formData['password'],
-                              )
-                              .then((value) async {
-                                if (value == true) {
-                                  ref.read(userDetilsProvider.notifier).build();
-                                  context.nav.pushNamedAndRemoveUntil(
-                                    Routes.home,
-                                    (route) => false,
-                                  );
-                                } else {
-                                  ref.invalidate(loginProvider);
-                                }
-                              });
+                          try {
+                            final result = await ref
+                                .read(loginProvider.notifier)
+                                .login(
+                                  phone: formData['phone'],
+                                  password: formData['password'],
+                                );
+                            
+                            if (result == true) {
+                              await ref.read(userDetilsProvider.notifier).build();
+                              if (context.mounted) {
+                                context.nav.pushNamedAndRemoveUntil(
+                                  Routes.home,
+                                  (route) => false,
+                                );
+                              }
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Invalid credentials'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                              ref.invalidate(loginProvider);
+                            }
+                          } catch (e) {
+                            print('Login error: $e');
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Login failed: ${e.toString()}'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                            ref.invalidate(loginProvider);
+                          }
                         }
                         // context.nav.pushNamed(Routes.home);
                       },

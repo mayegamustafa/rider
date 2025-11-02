@@ -42,6 +42,75 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
   final _formKey = GlobalKey<FormBuilderState>();
   List<FormFieldValidator<String>> validators = [];
   File? image;
+
+  Future<void> _showOTPMethodDialog(BuildContext context, Map<String, dynamic> data, WidgetRef ref) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(S.of(context).selectOTPMethod),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text(S.of(context).sendViaSMS),
+                onTap: () => _handleOTPSend(dialogContext, context, data, ref, false),
+              ),
+              ListTile(
+                leading: Icon(Icons.email),
+                title: Text(S.of(context).sendViaEmail),
+                onTap: () => _handleOTPSend(dialogContext, context, data, ref, true),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleOTPSend(
+    BuildContext dialogContext,
+    BuildContext mainContext,
+    Map<String, dynamic> data,
+    WidgetRef ref,
+    bool sendToEmail,
+  ) async {
+    Navigator.pop(dialogContext);
+    final result = await ref.read(sendOTPProvider.notifier).sendOTP(
+          phone: data["phone"],
+          email: data["email"],
+          isForgetPass: false,
+          sendToEmail: sendToEmail,
+        );
+        
+    if (!mounted) return;
+
+    if (result['success'] == true) {
+      ScaffoldMessenger.of(mainContext).showSnackBar(
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor: Colors.green,
+        ),
+      );
+      await mainContext.nav.pushNamed(
+        Routes.confirmOTP,
+        arguments: ConfirmOTPScreenArguments(
+          phoneNumber: data["phone"],
+          isPasswordRecover: false,
+          userData: data,
+          otp: result['otp'],
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(mainContext).showSnackBar(
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
   void pickImage({required ImageSource source}) async {
     final pickedFile = await ImagePicker().pickImage(
       source: source,
@@ -525,99 +594,7 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                             return;
                           }
                           // Show OTP method selection dialog
-                          await showDialog(
-                            context: context,
-                            builder: (BuildContext dialogContext) {
-                              return AlertDialog(
-                                title: Text('Select OTP Method'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      leading: Icon(Icons.phone),
-                                      title: Text('Send OTP via SMS'),
-                                      onTap: () async {
-                                        Navigator.pop(dialogContext);
-                                        final result = await ref
-                                            .read(sendOTPProvider.notifier)
-                                            .sendOTP(
-                                              phone: data["phone"],
-                                              email: data["email"],
-                                              isForgetPass: false,
-                                              sendToEmail: false,
-                                            );
-                                            
-                                        if (result['success'] == true && context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text(result['message']),
-                                              backgroundColor: Colors.green,
-                                            ),
-                                          );
-                                          await context.nav.pushNamed(
-                                            Routes.confirmOTP,
-                                            arguments: ConfirmOTPScreenArguments(
-                                              phoneNumber: data["phone"],
-                                              isPasswordRecover: false,
-                                              userData: data,
-                                              otp: result['otp'],
-                                            ),
-                                          );
-                                        } else if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text(result['message']),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    ListTile(
-                                      leading: Icon(Icons.email),
-                                      title: Text('Send OTP via Email'),
-                                      onTap: () async {
-                                        Navigator.pop(dialogContext);
-                                        final result = await ref
-                                            .read(sendOTPProvider.notifier)
-                                            .sendOTP(
-                                              phone: data["phone"],
-                                              email: data["email"],
-                                              isForgetPass: false,
-                                              sendToEmail: true,
-                                            );
-                                            
-                                        if (result['success'] == true && context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text(result['message']),
-                                              backgroundColor: Colors.green,
-                                            ),
-                                          );
-                                          await context.nav.pushNamed(
-                                            Routes.confirmOTP,
-                                            arguments: ConfirmOTPScreenArguments(
-                                              phoneNumber: data["phone"],
-                                              isPasswordRecover: false,
-                                              userData: data,
-                                              otp: result['otp'],
-                                            ),
-                                          );
-                                        } else if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text(result['message']),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
+                          _showOTPMethodDialog(context, data, ref);
                           });
                         } else {
                           if (image == null) {

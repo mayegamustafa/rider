@@ -46,11 +46,20 @@ class _ConfirmOTPLayoutState extends ConsumerState<ConfirmOTPLayout> {
   }
 
   Future initOTP() async {
-    String? otp = await ref
+    final result = await ref
         .read(sendOTPProvider.notifier)
         .sendOTP(phone: widget.arguments.phoneNumber, isForgetPass: false);
-    if (otp != null) {
-      pinCodeController.text = otp;
+    if (result['success'] == true) {
+      pinCodeController.text = result['otp'];
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

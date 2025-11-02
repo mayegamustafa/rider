@@ -55,12 +55,16 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
               ListTile(
                 leading: Icon(Icons.phone),
                 title: Text(S.of(context).sendViaSMS),
-                onTap: () => _handleOTPSend(dialogContext, context, data, ref, false),
+                onTap: () async {
+                                        await _handleOTPSend(dialogContext, context, data, ref, false);
+                                      },
               ),
               ListTile(
                 leading: Icon(Icons.email),
                 title: Text(S.of(context).sendViaEmail),
-                onTap: () => _handleOTPSend(dialogContext, context, data, ref, true),
+                onTap: () async {
+                                        await _handleOTPSend(dialogContext, context, data, ref, true);
+                                      },
               ),
             ],
           ),
@@ -594,7 +598,7 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                             return;
                           }
                           // Show OTP method selection dialog
-                          _showOTPMethodDialog(context, data, ref);
+                          await _showOTPMethodDialog(context, data, ref);
                           });
                         } else {
                           if (image == null) {

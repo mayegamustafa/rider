@@ -1,4 +1,7 @@
 {
+    "selectOTPMethod": "Select OTP Method",
+    "sendViaSMS": "Send OTP via SMS",
+    "sendViaEmail": "Send OTP via Email",
     "welcomBack": "Welcome Back!",
     "phoneNumber": "Phone Number",
     "enterPhoneNumber": "Enter Phone Number",

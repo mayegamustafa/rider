@@ -1,0 +1,28 @@
+{
+  "buildFiles": [
+    "/Users/razinsoft/fvm/versions/3.29.3/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/razinsoft/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/razinsoft/development/Razinsoft projects/ready-ecommerce-rider/android/app/.cxx/Debug/12u23646/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/razinsoft/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/razinsoft/development/Razinsoft projects/ready-ecommerce-rider/android/app/.cxx/Debug/12u23646/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {},
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/razinsoft/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/razinsoft/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": []
+}

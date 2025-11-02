@@ -1,0 +1,2 @@
+/Users/mdshakilhossain/development/Project/ready-ecommerce-rider/android/app/.cxx/RelWithDebInfo/2ck6t456/x86_64/CMakeFiles/edit_cache.dir
+/Users/mdshakilhossain/development/Project/ready-ecommerce-rider/android/app/.cxx/RelWithDebInfo/2ck6t456/x86_64/CMakeFiles/rebuild_cache.dir

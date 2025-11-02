@@ -524,33 +524,108 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                 message: response['message'], isSuccess: false);
                             return;
                           }
-                          ref
-                              .read(sendOTPProvider.notifier)
-                              .sendOTP(
-                                  phone: data["phone"], isForgetPass: false)
-                              .then((value) async {
-                            if (value != null) {
-                              if (context.mounted) {
-                                await context.nav.pushNamed(
-                                  Routes.confirmOTP,
-                                  arguments: ConfirmOTPScreenArguments(
-                                    phoneNumber: data["phone"],
-                                    isPasswordRecover: false,
-                                    userData: data,
-                                    otp: value,
-                                  ),
-                                );
-                              }
-                            } else {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Failed to send OTP. Please try again.'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            }
+                          // Show OTP method selection dialog
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Select OTP Method'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: Icon(Icons.phone),
+                                      title: Text('Send OTP via SMS'),
+                                      onTap: () async {
+                                        Navigator.pop(context);
+                                        final result = await ref
+                                            .read(sendOTPProvider.notifier)
+                                            .sendOTP(
+                                              phone: data["phone"],
+                                              email: data["email"],
+                                              isForgetPass: false,
+                                              sendToEmail: false,
+                                            );
+                                            
+                                        if (result['success'] == true) {
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(result['message']),
+                                                backgroundColor: Colors.green,
+                                              ),
+                                            );
+                                            await context.nav.pushNamed(
+                                              Routes.confirmOTP,
+                                              arguments: ConfirmOTPScreenArguments(
+                                                phoneNumber: data["phone"],
+                                                isPasswordRecover: false,
+                                                userData: data,
+                                                otp: result['otp'],
+                                              ),
+                                            );
+                                          }
+                                        } else {
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(result['message']),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: Icon(Icons.email),
+                                      title: Text('Send OTP via Email'),
+                                      onTap: () async {
+                                        Navigator.pop(context);
+                                        final result = await ref
+                                            .read(sendOTPProvider.notifier)
+                                            .sendOTP(
+                                              phone: data["phone"],
+                                              email: data["email"],
+                                              isForgetPass: false,
+                                              sendToEmail: true,
+                                            );
+                                            
+                                        if (result['success'] == true) {
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(result['message']),
+                                                backgroundColor: Colors.green,
+                                              ),
+                                            );
+                                            await context.nav.pushNamed(
+                                              Routes.confirmOTP,
+                                              arguments: ConfirmOTPScreenArguments(
+                                                phoneNumber: data["phone"],
+                                                isPasswordRecover: false,
+                                                userData: data,
+                                                otp: result['otp'],
+                                              ),
+                                            );
+                                          }
+                                        } else {
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(result['message']),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
                           });
                         } else {
                           if (image == null) {

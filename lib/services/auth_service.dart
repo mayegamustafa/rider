@@ -37,11 +37,17 @@ class AuthService implements AuthRepo {
   }
 
   @override
-  Future<Response> sendOTP(
-      {required String phone, required bool isForgetPass}) async {
+  Future<Response> sendOTP({
+    required String phone,
+    required bool isForgetPass,
+    String? email,
+    bool? sendToEmail = false,
+  }) async {
     return ref.read(apiClientProvider).post(AppConstants.sendOTPUrl, data: {
       'phone': phone,
       'forgot_password': isForgetPass,
+      if (email != null) 'email': email,
+      if (sendToEmail != null) 'send_to_email': sendToEmail,
     });
   }
 

@@ -49,15 +49,22 @@ class SendOTP extends _$SendOTP {
     return false;
   }
 
-  Future<String?> sendOTP({
+  Future<Map<String, dynamic>> sendOTP({
     required String phone,
     required bool isForgetPass,
+    String? email,
+    bool? sendToEmail,
   }) async {
     state = true;
     try {
       final response = await ref
           .read(authServiceProvider)
-          .sendOTP(phone: phone, isForgetPass: isForgetPass);
+          .sendOTP(
+            phone: phone,
+            isForgetPass: isForgetPass,
+            email: email,
+            sendToEmail: sendToEmail,
+          );
       
       print("OTP Response: ${response.data}"); // Debug log
       
@@ -67,15 +74,27 @@ class SendOTP extends _$SendOTP {
                    response.data['otp']?.toString();
                    
         if (otp != null) {
-          return otp;
+          return {
+            'success': true,
+            'otp': otp,
+            'message': sendToEmail == true 
+                ? 'OTP sent to your email' 
+                : 'OTP sent to your phone'
+          };
         }
       }
       state = false;
-      return null;
+      return {
+        'success': false,
+        'message': 'Failed to send OTP'
+      };
     } catch (e) {
       print("Send OTP error: $e");
       state = false;
-      return null;
+      return {
+        'success': false,
+        'message': 'Error sending OTP: ${e.toString()}'
+      };
     }
   }
 }

@@ -177,7 +177,7 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
                     ? const Center(child: CircularProgressIndicator())
                     : MyCustomButton(
                       btnText: S.of(context).login,
-                      onTap: () {
+                      onTap: () async {
                         if (_formKey.currentState!.saveAndValidate()) {
                           final formData = _formKey.currentState!.value;
                           try {

@@ -117,7 +117,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                         isForgetPass: true,
                                       )
                                       .then((value) {
-                                    if (value != null) {
+                                    if (value['success'] == true) {
                                       context.nav.pushNamed(
                                         Routes.confirmOTP,
                                         arguments: ConfirmOTPScreenArguments(
@@ -126,7 +126,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                               .toString(),
                                           isPasswordRecover: true,
                                           userData: {},
-                                          otp: value,
+                                          otp: value['otp'],
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(value['message']),
+                                          backgroundColor: Colors.red,
                                         ),
                                       );
                                     }

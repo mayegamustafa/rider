@@ -525,9 +525,9 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                             return;
                           }
                           // Show OTP method selection dialog
-                          showDialog(
+                          await showDialog(
                             context: context,
-                            builder: (BuildContext context) {
+                            builder: (BuildContext dialogContext) {
                               return AlertDialog(
                                 title: Text('Select OTP Method'),
                                 content: Column(
@@ -537,7 +537,7 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                       leading: Icon(Icons.phone),
                                       title: Text('Send OTP via SMS'),
                                       onTap: () async {
-                                        Navigator.pop(context);
+                                        Navigator.pop(dialogContext);
                                         final result = await ref
                                             .read(sendOTPProvider.notifier)
                                             .sendOTP(
@@ -547,33 +547,29 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                               sendToEmail: false,
                                             );
                                             
-                                        if (result['success'] == true) {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(result['message']),
-                                                backgroundColor: Colors.green,
-                                              ),
-                                            );
-                                            await context.nav.pushNamed(
-                                              Routes.confirmOTP,
-                                              arguments: ConfirmOTPScreenArguments(
-                                                phoneNumber: data["phone"],
-                                                isPasswordRecover: false,
-                                                userData: data,
-                                                otp: result['otp'],
-                                              ),
-                                            );
-                                          }
-                                        } else {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(result['message']),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
+                                        if (result['success'] == true && context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(result['message']),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                          await context.nav.pushNamed(
+                                            Routes.confirmOTP,
+                                            arguments: ConfirmOTPScreenArguments(
+                                              phoneNumber: data["phone"],
+                                              isPasswordRecover: false,
+                                              userData: data,
+                                              otp: result['otp'],
+                                            ),
+                                          );
+                                        } else if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(result['message']),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
                                         }
                                       },
                                     ),
@@ -581,7 +577,7 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                       leading: Icon(Icons.email),
                                       title: Text('Send OTP via Email'),
                                       onTap: () async {
-                                        Navigator.pop(context);
+                                        Navigator.pop(dialogContext);
                                         final result = await ref
                                             .read(sendOTPProvider.notifier)
                                             .sendOTP(
@@ -591,33 +587,29 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                               sendToEmail: true,
                                             );
                                             
-                                        if (result['success'] == true) {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(result['message']),
-                                                backgroundColor: Colors.green,
-                                              ),
-                                            );
-                                            await context.nav.pushNamed(
-                                              Routes.confirmOTP,
-                                              arguments: ConfirmOTPScreenArguments(
-                                                phoneNumber: data["phone"],
-                                                isPasswordRecover: false,
-                                                userData: data,
-                                                otp: result['otp'],
-                                              ),
-                                            );
-                                          }
-                                        } else {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(result['message']),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
+                                        if (result['success'] == true && context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(result['message']),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                          await context.nav.pushNamed(
+                                            Routes.confirmOTP,
+                                            arguments: ConfirmOTPScreenArguments(
+                                              phoneNumber: data["phone"],
+                                              isPasswordRecover: false,
+                                              userData: data,
+                                              otp: result['otp'],
+                                            ),
+                                          );
+                                        } else if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(result['message']),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
                                         }
                                       },
                                     ),

@@ -15,35 +15,27 @@ class Login extends _$Login {
 
   Future<bool> login({required String phone, required String password}) async {
     state = true;
-    final response = await ref
-        .read(authServiceProvider)
-        .login(phone: phone, password: password);
-    if (response.statusCode == 200) {
-      final data = response.data['data'] ?? response.data;
-      // Try common token locations
-      String? token;
-      try {
-        token = (data is Map && data['access'] != null && data['access']['token'] != null)
-            ? data['access']['token'].toString()
-            : null;
-      } catch (_) {
-        token = null;
-      }
-      token ??= (data is Map && data['token'] != null) ? data['token'].toString() : null;
-      token ??= (response.data is Map && response.data['token'] != null)
-          ? response.data['token'].toString()
-          : null;
-
-      Box authBox = Hive.box(AppConstants.authBox);
-      if (token != null) {
-        authBox.put(AppConstants.authToken, token);
-      } else {
-        // store full data for debugging if token missing
-        authBox.put(AppConstants.userData, data);
+    try {
+      final response = await ref
+          .read(authServiceProvider)
+          .login(phone: phone, password: password);
+      
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data;
+        String? token = data['data']?['token'] ?? data['token'];
+        
+        if (token != null) {
+          Box authBox = Hive.box(AppConstants.authBox);
+          authBox.put(AppConstants.authToken, token);
+          authBox.put(AppConstants.userData, data['data'] ?? data);
+          state = false;
+          return true;
+        }
       }
       state = false;
-      return true;
-    } else {
+      return false;
+    } catch (e) {
+      print("Login error: $e");
       state = false;
       return false;
     }
@@ -62,13 +54,26 @@ class SendOTP extends _$SendOTP {
     required bool isForgetPass,
   }) async {
     state = true;
-    final response = await ref
-        .read(authServiceProvider)
-        .sendOTP(phone: phone, isForgetPass: isForgetPass);
-    if (response.statusCode == 200) {
+    try {
+      final response = await ref
+          .read(authServiceProvider)
+          .sendOTP(phone: phone, isForgetPass: isForgetPass);
+      
+      print("OTP Response: ${response.data}"); // Debug log
+      
+      if (response.statusCode == 200) {
+        state = false;
+        final otp = response.data['data']?['otp']?.toString() ?? 
+                   response.data['otp']?.toString();
+                   
+        if (otp != null) {
+          return otp;
+        }
+      }
       state = false;
-      return await response.data['data']['otp'].toString();
-    } else {
+      return null;
+    } catch (e) {
+      print("Send OTP error: $e");
       state = false;
       return null;
     }

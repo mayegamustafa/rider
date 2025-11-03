@@ -599,7 +599,6 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                           }
                           // Show OTP method selection dialog
                           await _showOTPMethodDialog(context, data, ref);
-                          });
                         } else {
                           if (image == null) {
                             GlobalFunction.showCustomSnackbar(

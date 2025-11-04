@@ -136,13 +136,28 @@ class Registration extends _$Registration {
 
   Future<bool> registration({required Map<String, dynamic> data}) async {
     state = true;
-    final response = await ref
-        .read(authServiceProvider)
-        .registration(data: data);
-    if (response.statusCode == 200) {
+    try {
+      final response = await ref
+          .read(authServiceProvider)
+          .registration(data: data);
+      
+      if (response.statusCode == 200) {
+        // Store the token if provided in the response
+        if (response.data['data']?['token'] != null) {
+          Box authBox = Hive.box(AppConstants.authBox);
+          authBox.put(AppConstants.authToken, response.data['data']['token']);
+          // Store user data if available
+          if (response.data['data']?['user'] != null) {
+            authBox.put(AppConstants.userData, response.data['data']['user']);
+          }
+        }
+        state = false;
+        return true;
+      }
       state = false;
-      return true;
-    } else {
+      return false;
+    } catch (e) {
+      print("Registration error: $e");
       state = false;
       return false;
     }

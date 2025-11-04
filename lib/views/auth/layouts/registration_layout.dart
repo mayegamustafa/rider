@@ -615,8 +615,16 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                 message: response['message'], isSuccess: false);
                             return;
                           }
-                          // Show OTP method selection dialog
-                          await _showOTPMethodDialog(context, data, ref);
+                          // Directly proceed with registration
+                          final result = await ref.read(registrationProvider.notifier).registration(data: data);
+                          if (result) {
+                            GlobalFunction.showCustomSnackbar(
+                                message: "Registration successful", isSuccess: true);
+                            context.nav.pushNamedAndRemoveUntil(Routes.home, (route) => false);
+                          } else {
+                            GlobalFunction.showCustomSnackbar(
+                                message: "Registration failed", isSuccess: false);
+                          }
                         } else {
                           if (image == null) {
                             GlobalFunction.showCustomSnackbar(

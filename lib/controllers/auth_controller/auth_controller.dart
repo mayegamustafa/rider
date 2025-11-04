@@ -18,9 +18,12 @@ class Login extends _$Login {
   Future<bool> login({required String phone, required String password}) async {
     state = true;
     try {
+      print("Attempting login with phone: $phone"); // Debug log
       final response = await ref
           .read(authServiceProvider)
           .login(phone: phone, password: password);
+      
+      print("Login Response: ${response.data}"); // Debug log
       
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
@@ -29,11 +32,17 @@ class Login extends _$Login {
         if (token != null) {
           Box authBox = Hive.box(AppConstants.authBox);
           authBox.put(AppConstants.authToken, token);
-          authBox.put(AppConstants.userData, data['data'] ?? data);
+          
+          // Store user data
+          final userData = data['data'] ?? data;
+          authBox.put(AppConstants.userData, userData);
+          
+          print("Login successful. Token stored."); // Debug log
           state = false;
           return true;
         }
       }
+      print("Login failed. Invalid response structure."); // Debug log
       state = false;
       return false;
     } catch (e) {

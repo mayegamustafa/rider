@@ -28,7 +28,13 @@ class LoginLayout extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Gap(65.h),
-          Hero(tag: "logo", child: _LogoSection()),
+          Hero(
+            tag: "logo", 
+            child: Image.asset(
+              'delivery.png',
+              width: 200.w,
+            ),
+          ),
           Gap(50.h),
           Expanded(child: SingleChildScrollView(child: _LoginForm())),
           Gap(20.h),

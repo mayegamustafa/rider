@@ -15,6 +15,7 @@ import 'package:razinshop_rider/generated/l10n.dart';
 import 'package:razinshop_rider/routers.dart';
 import 'package:razinshop_rider/utils/context_less_navigate.dart';
 import 'package:razinshop_rider/utils/extensions.dart';
+import 'package:razinshop_rider/utils/phone_validator.dart';
 
 class LoginLayout extends ConsumerWidget {
   const LoginLayout({super.key});
@@ -114,17 +115,20 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
               name: "phone",
               keyboardType: TextInputType.phone,
               decoration: AppTheme.inputDecoration.copyWith(
-                hintText: '',
+                hintText: '0700000000 or 256700000000',
+                helperText: 'Enter Ugandan phone number',
               ),
-              validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(
-                  errorText: S.of(context).invalidPhnNmbr,
-                ),
-                FormBuilderValidators.minLength(
-                  11,
-                  errorText: S.of(context).invalidPhnNmbr,
-                ),
-              ]),
+              validator: (value) {
+                return PhoneValidator.validateUgandanPhone(value, context);
+              },
+              onChanged: (value) {
+                if (value != null && value.isNotEmpty) {
+                  final normalizedNumber = PhoneValidator.normalizeUgandanPhone(value);
+                  if (normalizedNumber != value) {
+                    _formKey.currentState?.fields['phone']?.didChange(normalizedNumber);
+                  }
+                }
+              },
             ),
             Gap(20.h),
             Text(S.of(context).password, style: AppTextStyle.normalBody),
@@ -181,10 +185,13 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
                         if (_formKey.currentState!.saveAndValidate()) {
                           final formData = _formKey.currentState!.value;
                           try {
+                            // Normalize the phone number before sending to API
+                            String normalizedPhone = PhoneValidator.normalizeUgandanPhone(formData['phone']);
+                            
                             final result = await ref
                                 .read(loginProvider.notifier)
                                 .login(
-                                  phone: formData['phone'],
+                                  phone: normalizedPhone,
                                   password: formData['password'],
                                 );
                             

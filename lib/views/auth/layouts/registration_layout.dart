@@ -24,6 +24,7 @@ import 'package:razinshop_rider/gen/assets.gen.dart';
 import 'package:razinshop_rider/generated/l10n.dart';
 import 'package:razinshop_rider/utils/context_less_navigate.dart';
 import 'package:razinshop_rider/utils/extensions.dart';
+import 'package:razinshop_rider/utils/phone_validator.dart';
 
 import '../../../routers.dart';
 import '../../../utils/global_function.dart';
@@ -270,10 +271,20 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                   name: 'phone',
                                   keyboardType: TextInputType.phone,
                                   decoration: AppTheme.inputDecoration.copyWith(
-                                    hintText: S.of(context).enterPhoneNumber,
+                                    hintText: '0700000000 or 256700000000',
+                                    helperText: 'Enter Ugandan phone number',
                                   ),
-                                  validator:
-                                      FormBuilderValidators.compose(validators),
+                                  validator: (value) {
+                                    return PhoneValidator.validateUgandanPhone(value, context);
+                                  },
+                                  onChanged: (value) {
+                                    if (value != null && value.isNotEmpty) {
+                                      final normalizedNumber = PhoneValidator.normalizeUgandanPhone(value);
+                                      if (normalizedNumber != value) {
+                                        _formKey.currentState?.fields['phone']?.didChange(normalizedNumber);
+                                      }
+                                    }
+                                  },
                                 ),
                                 Gap(20.r),
                                 // email optional
@@ -555,8 +566,13 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                     onTap: () async {
                       if (widget.isProfileUpdate) {
                         if (_formKey.currentState!.saveAndValidate()) {
+                          final formData = _formKey.currentState!.value;
+                          // Normalize phone number
+                          final normalizedPhone = PhoneValidator.normalizeUgandanPhone(formData['phone']);
+                          
                           final data = {
-                            ..._formKey.currentState!.value,
+                            ...formData,
+                            'phone': normalizedPhone,
                             if (image != null)
                               "profile_photo":
                                   await MultipartFile.fromFile(image!.path)

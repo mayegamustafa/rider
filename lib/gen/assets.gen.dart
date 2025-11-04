@@ -207,6 +207,10 @@ class Assets {
 
   static const $AssetsPngsGen pngs = $AssetsPngsGen();
   static const $AssetsSvgsGen svgs = $AssetsSvgsGen();
+  static const AssetGenImage delivery = AssetGenImage('delivery.png');
+
+  /// List of all assets
+  static List<AssetGenImage> get values => [delivery];
 }
 
 class AssetGenImage {

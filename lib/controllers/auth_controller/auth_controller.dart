@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:razinshop_rider/config/app_constants.dart';
@@ -209,14 +211,13 @@ class CreatePassword extends _$CreatePassword {
 @Riverpod(keepAlive: true)
 class UserDetails extends _$UserDetails {
   @override
-  Future<void> build() async {
+  FutureOr<void> build() async {
     final response = await ref.read(authServiceProvider).userDetails();
     if (response.statusCode == 200) {
       final data = response.data['data'];
       Box authBox = Hive.box(AppConstants.authBox);
       authBox.put(AppConstants.userData, data);
     }
-  return;
   }
 }
 

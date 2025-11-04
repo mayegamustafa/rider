@@ -6,7 +6,7 @@ part of 'auth_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$loginHash() => r'c3a2e69cdc14b35bed8b90a8bafa183ed1a1a24d';
+String _$loginHash() => r'6c721ac6546c1a4fc1de8807d8ac5721d084a096';
 
 /// See also [Login].
 @ProviderFor(Login)
@@ -20,7 +20,7 @@ final loginProvider = AutoDisposeNotifierProvider<Login, bool>.internal(
 );
 
 typedef _$Login = AutoDisposeNotifier<bool>;
-String _$sendOTPHash() => r'2625bd1459f6b9ba594a12297fda0d4d51966533';
+String _$sendOTPHash() => r'e62c2d60ed852f21065ba646031c3197b5c9c0b2';
 
 /// See also [SendOTP].
 @ProviderFor(SendOTP)
@@ -212,8 +212,6 @@ class CheckUserStatusProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin CheckUserStatusRef on AutoDisposeNotifierProviderRef<void> {
   /// The parameter `arg` of this provider.
   String get arg;
@@ -258,20 +256,20 @@ final createPasswordProvider =
 );
 
 typedef _$CreatePassword = AutoDisposeNotifier<bool>;
-String _$userDetilsHash() => r'8f3beefbec4b99448bfb055f46a83cfdb0b46d1e';
+String _$userDetailsHash() => r'2222ddd3aaf05f1742d92044fe52f05e14ff62a9';
 
-/// See also [UserDetils].
-@ProviderFor(UserDetils)
-final userDetilsProvider = AsyncNotifierProvider<UserDetils, void>.internal(
-  UserDetils.new,
-  name: r'userDetilsProvider',
+/// See also [UserDetails].
+@ProviderFor(UserDetails)
+final userDetailsProvider = AsyncNotifierProvider<UserDetails, void>.internal(
+  UserDetails.new,
+  name: r'userDetailsProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$userDetilsHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$userDetailsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$UserDetils = AsyncNotifier<void>;
+typedef _$UserDetails = AsyncNotifier<void>;
 String _$changePasswordHash() => r'6b029fb0df845c6299c8dd52a71dc52b169f3846';
 
 /// See also [ChangePassword].
@@ -322,4 +320,4 @@ final updateProfileProvider =
 
 typedef _$UpdateProfile = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

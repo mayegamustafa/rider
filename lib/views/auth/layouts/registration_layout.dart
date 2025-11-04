@@ -373,7 +373,7 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                                 headerText(title: S.of(context).drivingLicense),
                                 Gap(10.r),
                                 FormBuilderTextField(
-                                  name: 'driving_lience',
+                                  name: 'driving_licence',
                                   decoration: AppTheme.inputDecoration.copyWith(
                                     hintText: S.of(context).enterDrivingLicense,
                                   ),
@@ -587,7 +587,7 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                               GlobalFunction.showCustomSnackbar(
                                   message: S.of(context).success,
                                   isSuccess: true);
-                              ref.refresh(userDetilsProvider);
+                              ref.refresh(userDetailsProvider);
                               Future.delayed(Duration(milliseconds: 500), () {
                                 // context.nav.pop();
                                 context.nav.pushNamedAndRemoveUntil(

@@ -207,7 +207,7 @@ class CreatePassword extends _$CreatePassword {
 }
 
 @Riverpod(keepAlive: true)
-class UserDetils extends _$UserDetils {
+class UserDetails extends _$UserDetails {
   @override
   Future<void> build() async {
     final response = await ref.read(authServiceProvider).userDetails();

@@ -196,7 +196,7 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
                                 );
                             
                             if (result == true) {
-                              await ref.read(userDetilsProvider.notifier).build();
+                              await ref.read(userDetailsProvider.notifier).build();
                               if (context.mounted) {
                                 context.nav.pushNamedAndRemoveUntil(
                                   Routes.home,

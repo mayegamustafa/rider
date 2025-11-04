@@ -82,7 +82,7 @@ class AuthService implements AuthRepo {
   Future<Response> createPassword({required Map<String, dynamic> data}) {
     return ref
         .read(apiClientProvider)
-        .post(AppConstants.createPassowrdUrl, data: data);
+        .post(AppConstants.createPasswordUrl, data: data);
   }
 
   @override

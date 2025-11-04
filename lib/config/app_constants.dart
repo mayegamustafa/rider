@@ -14,7 +14,7 @@ class AppConstants {
   static const String checkUserStatusUrl = '$baseUrl/rider/check-user-status';
   static const String ordersUrl = '$baseUrl/rider/orders';
   static const String orderDetailsUrl = '$baseUrl/rider/orders/details';
-  static const String createPassowrdUrl = '$baseUrl/rider/create-password';
+  static const String createPasswordUrl = '$baseUrl/rider/create-password';
   static const String orderStatusUpdateUrl =
       '$baseUrl/rider/orders/status-update';
   static const String userDetails = '$baseUrl/rider/details';

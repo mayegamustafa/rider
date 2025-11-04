@@ -76,7 +76,7 @@ class _OrderListSectionState extends ConsumerState<OrderListSection> {
                         const SizedBox(height: 20),
                         ElevatedButton.icon(
                           onPressed: () {
-                            await ref.refresh(orderListProvider);
+                            ref.refresh(orderListProvider);
                           },
                           icon: const Icon(Icons.refresh),
                           label: const Text("Refresh"),
@@ -130,7 +130,7 @@ class _OrderListSectionState extends ConsumerState<OrderListSection> {
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: () {
-                    await ref.refresh(orderListProvider);
+                    ref.refresh(orderListProvider);
                   },
                   icon: const Icon(Icons.refresh),
                   label: const Text("Retry"),

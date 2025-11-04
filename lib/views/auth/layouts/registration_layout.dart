@@ -587,7 +587,7 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                               GlobalFunction.showCustomSnackbar(
                                   message: S.of(context).success,
                                   isSuccess: true);
-                              await ref.refresh(userDetilsProvider);
+                              ref.refresh(userDetilsProvider);
                               Future.delayed(Duration(milliseconds: 500), () {
                                 // context.nav.pop();
                                 context.nav.pushNamedAndRemoveUntil(

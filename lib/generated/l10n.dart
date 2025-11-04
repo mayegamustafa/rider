@@ -50,6 +50,36 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
+  /// `Select OTP Method`
+  String get selectOTPMethod {
+    return Intl.message(
+      'Select OTP Method',
+      name: 'selectOTPMethod',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send OTP via SMS`
+  String get sendViaSMS {
+    return Intl.message(
+      'Send OTP via SMS',
+      name: 'sendViaSMS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send OTP via Email`
+  String get sendViaEmail {
+    return Intl.message(
+      'Send OTP via Email',
+      name: 'sendViaEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Welcome Back!`
   String get welcomBack {
     return Intl.message(

@@ -119,9 +119,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "riderSupport": MessageLookupByLibrary.simpleMessage("Rider Support"),
         "searchOrder": MessageLookupByLibrary.simpleMessage("Search Order"),
         "select": MessageLookupByLibrary.simpleMessage("Select"),
+        "selectOTPMethod":
+            MessageLookupByLibrary.simpleMessage("Select OTP Method"),
         "selectVehicleType":
             MessageLookupByLibrary.simpleMessage("Select Vehicle Type"),
         "sendOTP": MessageLookupByLibrary.simpleMessage("Send OTP"),
+        "sendViaEmail":
+            MessageLookupByLibrary.simpleMessage("Send OTP via Email"),
+        "sendViaSMS": MessageLookupByLibrary.simpleMessage("Send OTP via SMS"),
         "setPassword": MessageLookupByLibrary.simpleMessage("Set Password"),
         "shippingInfo": MessageLookupByLibrary.simpleMessage("Shipping Info"),
         "slideToConfirmDelivery":

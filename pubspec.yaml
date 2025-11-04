@@ -45,8 +45,11 @@ dev_dependencies:
   riverpod_generator: ^2.4.0
   build_runner: ^2.4.9
   flutter_gen_runner:
+  intl_translation: ^0.20.1
+  intl_utils: ^2.8.8
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
     - assets/pngs/

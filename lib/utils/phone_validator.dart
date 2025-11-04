@@ -3,42 +3,46 @@ import 'package:flutter/material.dart';
 
 class PhoneValidator {
   // Cache the regex pattern to avoid recompilation
-  static final RegExp _ugandaPhoneRegex = RegExp(r'^256(70|71|72|74|75|77|78|79)[0-9]{7}$');
-  static final RegExp _cleanupRegex = RegExp(r'\s+|-|\+');
+  static final RegExp _phoneRegex = RegExp(r'^\+?[1-9]\d{1,14}$');
+  static final RegExp _cleanupRegex = RegExp(r'\s+|-');
 
   static String? validateUgandanPhone(String? value, BuildContext context) {
     if (value == null || value.isEmpty) {
       return 'Phone number is required';
     }
 
-    // Remove any whitespace, dashes or plus signs
+    // Remove any whitespace and dashes but keep the + sign
     value = value.replaceAll(_cleanupRegex, '');
 
     // Quick length check before further processing
-    if (value.length < 10 || value.length > 12) {
+    if (value.length < 8 || value.length > 15) {
       return 'Invalid phone number length';
     }
 
-    // Check if the number starts with 0 or 256
+    // If number starts with 0, assume it's a local number
     if (value.startsWith('0')) {
-      value = '256${value.substring(1)}';
+      value = value.substring(1);
     }
 
-    // Final validation with regex
-    if (!_ugandaPhoneRegex.hasMatch(value)) {
-      return 'Invalid Uganda phone number format';
+    // Make sure it matches international format
+    if (!_phoneRegex.hasMatch(value)) {
+      return 'Invalid phone number format';
     }
 
     return null;
   }
 
   static String normalizeUgandanPhone(String phoneNumber) {
-    // Remove any whitespace, dashes or plus signs
-    phoneNumber = phoneNumber.replaceAll(RegExp(r'\s+|-|\+'), '');
+    // Remove any whitespace and dashes but keep the + sign
+    phoneNumber = phoneNumber.replaceAll(RegExp(r'\s+|-'), '');
 
-    // If number starts with 0, replace it with 256
-    if (phoneNumber.startsWith('0') && phoneNumber.length > 1) {
-      phoneNumber = '256${phoneNumber.substring(1)}';
+    // If it doesn't start with +, add it
+    if (!phoneNumber.startsWith('+')) {
+      // If it starts with 0, remove it first
+      if (phoneNumber.startsWith('0')) {
+        phoneNumber = phoneNumber.substring(1);
+      }
+      phoneNumber = '+$phoneNumber';
     }
 
     return phoneNumber;

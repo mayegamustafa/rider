@@ -23,14 +23,15 @@ class Login extends _$Login {
       print("Original Phone: $phone");
       print("Password Length: ${password.length}");
       
-      // Normalize phone number and validate
+      // Normalize phone number
       final normalizedPhone = PhoneValidator.normalizeUgandanPhone(phone);
       print("Normalized Phone: $normalizedPhone");
       
-      if (!RegExp(r'^\+256\d{9}$').hasMatch(normalizedPhone)) {
+      // Basic validation that it's a valid phone number
+      if (!RegExp(r'^\+[1-9]\d{1,14}$').hasMatch(normalizedPhone)) {
         print("\n--------- VALIDATION ERROR ---------");
         print("Invalid phone number format");
-        throw Exception("Invalid phone number format. Please enter a valid Ugandan phone number.");
+        throw Exception("Invalid phone number format. Please enter a valid phone number.");
       }
       
       final response = await ref
@@ -107,6 +108,12 @@ class SendOTP extends _$SendOTP {
   }) async {
     state = true;
     try {
+      print("\n--------- SENDING OTP ---------");
+      print("Phone: $phone");
+      print("Is Forgot Password: $isForgetPass");
+      print("Email: $email");
+      print("Send to Email: $sendToEmail");
+      
       final response = await ref
           .read(authServiceProvider)
           .sendOTP(
@@ -116,30 +123,50 @@ class SendOTP extends _$SendOTP {
             sendToEmail: sendToEmail,
           );
       
-      print("OTP Response: ${response.data}"); // Debug log
+      print("\n--------- OTP RESPONSE ---------");
+      print("Status Code: ${response.statusCode}");
+      print("Response Data: ${response.data}");
       
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         state = false;
-        final otp = response.data['data']?['otp']?.toString() ?? 
-                   response.data['otp']?.toString();
+        
+        // Try to get OTP from different possible response structures
+        String? otp = response.data['data']?['otp']?.toString() ?? 
+                     response.data['otp']?.toString() ??
+                     response.data['data']?['code']?.toString();
+        
+        String? responseEmail = response.data['data']?['email']?.toString() ??
+                              response.data['email']?.toString();
                    
         if (otp != null) {
+          print("OTP found in response: $otp");
           return {
             'success': true,
             'otp': otp,
-            'message': sendToEmail == true 
-                ? 'OTP sent to your email' 
-                : 'OTP sent to your phone'
+            'email': responseEmail,
+            'message': 'OTP sent successfully'
           };
+        } else {
+          print("No OTP found in response");
         }
       }
+      
+      // If we get here, something went wrong
+      String errorMessage = response.data['message'] ?? 
+                          response.data['error'] ?? 
+                          'Failed to send OTP';
+                          
+      print("\n--------- OTP ERROR ---------");
+      print("Error: $errorMessage");
+      
       state = false;
       return {
         'success': false,
-        'message': 'Failed to send OTP'
+        'message': errorMessage
       };
     } catch (e) {
-      print("Send OTP error: $e");
+      print("\n--------- OTP ERROR ---------");
+      print("Error: $e");
       state = false;
       return {
         'success': false,
@@ -201,13 +228,19 @@ class Registration extends _$Registration {
         'profile_photo'
       ];
 
+      String? missingField;
       for (var field in requiredFields) {
         if (!data.containsKey(field) || data[field] == null || data[field].toString().isEmpty) {
           print('\n--------- VALIDATION ERROR ---------');
           print('Missing or empty required field: $field');
-          state = false;
-          return false;
+          missingField = field;
+          break;
         }
+      }
+
+      if (missingField != null) {
+        state = false;
+        throw Exception('Please fill in the ${missingField.replaceAll('_', ' ')}');
       }
 
       // Email validation
@@ -215,7 +248,7 @@ class Registration extends _$Registration {
         print('\n--------- VALIDATION ERROR ---------');
         print('Invalid email format: ${data['email']}');
         state = false;
-        return false;
+        throw Exception('Please enter a valid email address');
       }
       
       final response = await ref
@@ -227,8 +260,8 @@ class Registration extends _$Registration {
       print("Response Data: ${response.data}");
       print("Response Headers: ${response.headers}");
       
-      if (response.statusCode == 200) {
-        print("\n--------- DATA PROCESSING ---------");
+      print("\n--------- DATA PROCESSING ---------");
+      if (response.statusCode == 200 || response.statusCode == 201) {
         if (response.data['data']?['token'] != null) {
           Box authBox = Hive.box(AppConstants.authBox);
           print("Storing token: ${response.data['data']['token']}");
@@ -239,18 +272,35 @@ class Registration extends _$Registration {
             print("Storing user data: ${response.data['data']['user']}");
             authBox.put(AppConstants.userData, response.data['data']['user']);
           }
-        } else {
-          print("No token found in response");
+          print("\n--------- REGISTRATION SUCCESS ---------");
+          state = false;
+          return true;
         }
-        print("\n--------- REGISTRATION SUCCESS ---------");
-        state = false;
-        return true;
       }
+      
+      // If we get here, something went wrong
       print("\n--------- REGISTRATION FAILED ---------");
-      print("Failed with status code: ${response.statusCode}");
-      print("Error message: ${response.data['message'] ?? 'No error message provided'}");
+      print("Status code: ${response.statusCode}");
+      
+      // Try to get a meaningful error message
+      String errorMessage = '';
+      if (response.data != null) {
+        if (response.data['message'] != null) {
+          errorMessage = response.data['message'];
+        } else if (response.data['error'] != null) {
+          errorMessage = response.data['error'];
+        } else if (response.data['data']?['message'] != null) {
+          errorMessage = response.data['data']['message'];
+        }
+      }
+      
+      if (errorMessage.isEmpty) {
+        errorMessage = 'Registration failed. Please try again.';
+      }
+      
+      print("Error message: $errorMessage");
       state = false;
-      return false;
+      throw Exception(errorMessage);
     } catch (e) {
       print("\n--------- REGISTRATION ERROR ---------");
       print("Error type: ${e.runtimeType}");

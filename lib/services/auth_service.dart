@@ -43,12 +43,34 @@ class AuthService implements AuthRepo {
     String? email,
     bool? sendToEmail = false,
   }) async {
-    return ref.read(apiClientProvider).post(AppConstants.sendOTPUrl, data: {
-      'phone': phone,
-      'forgot_password': isForgetPass,
-      if (email != null) 'email': email,
-      if (sendToEmail != null) 'send_to_email': sendToEmail,
-    });
+    print("\n--------- SENDING OTP REQUEST ---------");
+    print("URL: ${AppConstants.sendOTPUrl}");
+    print("Phone: $phone");
+    print("Is Forgot Password: $isForgetPass");
+    print("Email: $email");
+    print("Send to Email: $sendToEmail");
+    
+    try {
+      final response = await ref.read(apiClientProvider).post(
+        AppConstants.sendOTPUrl, 
+        data: {
+          'phone': phone,
+          'forgot_password': isForgetPass,
+          'send_to_email': true, // Always try to send to email for forgot password
+          if (email != null) 'email': email,
+        },
+      );
+      
+      print("\n--------- OTP API RESPONSE ---------");
+      print("Status: ${response.statusCode}");
+      print("Response: ${response.data}");
+      
+      return response;
+    } catch (e) {
+      print("\n--------- OTP API ERROR ---------");
+      print("Error sending OTP: $e");
+      rethrow;
+    }
   }
 
   @override

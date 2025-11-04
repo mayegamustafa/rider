@@ -45,9 +45,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       ),
       body: Column(
         children: [
-          context.isDark
-              ? Assets.pngs.riderAppDark.image(width: 200.w)
-              : Assets.pngs.riderApp.image(width: 200.w),
+          Image.asset(
+            'delivery.png',
+            width: 200.w,
+          ),
           Gap(65.h),
           FormBuilder(
             key: _formKey,
@@ -122,30 +123,53 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                   final normalizedPhone = PhoneValidator.normalizeUgandanPhone(phone);
                                   
                                   try {
+                                    // Try sending OTP to both phone and email
                                     final value = await ref
                                         .read(sendOTPProvider.notifier)
                                         .sendOTP(
                                           phone: normalizedPhone,
                                           isForgetPass: true,
+                                          email: null, // We'll get email from backend based on phone
+                                          sendToEmail: true,
                                         );
+                                    
+                                    print("\n--------- OTP RESPONSE ---------");
+                                    print("Response: $value");
                                         
                                     if (value['success'] == true) {
                                       if (context.mounted) {
-                                        context.nav.pushNamed(
-                                          Routes.confirmOTP,
-                                          arguments: ConfirmOTPScreenArguments(
-                                            phoneNumber: normalizedPhone,
-                                            isPasswordRecover: true,
-                                            userData: {},
-                                            otp: value['otp'],
-                                          ),
+                                        await showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text('OTP Sent'),
+                                              content: Text('An OTP has been sent to your registered email address.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context); // Close dialog
+                                                    context.nav.pushNamed(
+                                                      Routes.confirmOTP,
+                                                      arguments: ConfirmOTPScreenArguments(
+                                                        phoneNumber: normalizedPhone,
+                                                        isPasswordRecover: true,
+                                                        userData: {},
+                                                        otp: value['otp'],
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Text('OK'),
+                                                ),
+                                              ],
+                                            );
+                                          },
                                         );
                                       }
                                     } else {
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: Text(value['message'] ?? 'Failed to send OTP'),
+                                            content: Text(value['message'] ?? 'Please check your phone number and try again'),
                                             backgroundColor: Colors.red,
                                           ),
                                         );
@@ -156,7 +180,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     if (context.mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
-                                          content: Text('Error sending OTP: ${e.toString()}'),
+                                          content: Text('Error: ${e.toString()}'),
                                           backgroundColor: Colors.red,
                                         ),
                                       );

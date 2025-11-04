@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:razinshop_rider/components/my_custom_button.dart';
@@ -13,6 +14,7 @@ import 'package:razinshop_rider/generated/l10n.dart';
 import 'package:razinshop_rider/routers.dart';
 import 'package:razinshop_rider/utils/context_less_navigate.dart';
 import 'package:razinshop_rider/utils/extensions.dart';
+import 'package:razinshop_rider/utils/phone_validator.dart';
 import 'package:razinshop_rider/views/auth/layouts/confirm_otp_layout.dart';
 
 class ForgotPassword extends StatefulWidget {

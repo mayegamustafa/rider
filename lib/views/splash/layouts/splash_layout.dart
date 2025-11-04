@@ -129,12 +129,14 @@ class _SplashLayoutState extends ConsumerState<SplashLayout> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            context.isDark
-                ? Assets.pngs.riderAppDark.image(width: 200.w)
-                : Assets.pngs.riderApp.image(
-                    width: 200.w,
-                    height: 200.h,
-                  ),
+            Image.asset(
+              'delivery.png',
+              width: 200.w,
+              height: 200.h,
+              fit: BoxFit.contain,
+              color: context.isDark ? Colors.white : null, // Invert color in dark mode
+              colorBlendMode: context.isDark ? BlendMode.srcIn : null,
+            ),
             Container(
               color: context.isDark ? Colors.black : Colors.white,
               height: 200.h,

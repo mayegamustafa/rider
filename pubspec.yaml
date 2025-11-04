@@ -54,6 +54,7 @@ flutter:
   assets:
     - assets/pngs/
     - assets/svgs/
+    - delivery.png
 
   fonts:
     - family: Mulish

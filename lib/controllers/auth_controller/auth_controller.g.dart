@@ -6,7 +6,7 @@ part of 'auth_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$loginHash() => r'6c721ac6546c1a4fc1de8807d8ac5721d084a096';
+String _$loginHash() => r'06ba0c21bd1436d7125225f5c098af60648b91d0';
 
 /// See also [Login].
 @ProviderFor(Login)
@@ -48,7 +48,7 @@ final verifyOTPProvider = AutoDisposeNotifierProvider<VerifyOTP, bool>.internal(
 );
 
 typedef _$VerifyOTP = AutoDisposeNotifier<bool>;
-String _$registrationHash() => r'2c320fa250df456c07a282a1c719c936b042f82e';
+String _$registrationHash() => r'c604e00578d6c3bf0fad5c3827665fb796714935';
 
 /// See also [Registration].
 @ProviderFor(Registration)

@@ -60,10 +60,32 @@ class AuthService implements AuthRepo {
   }
 
   @override
-  Future<Response> registration({required Map<String, dynamic> data}) {
-    return ref
-        .read(apiClientProvider)
-        .post(AppConstants.registrationUrl, data: FormData.fromMap(data));
+  Future<Response> registration({required Map<String, dynamic> data}) async {
+    print("\n--------- REGISTRATION API CALL ---------");
+    print("URL: ${AppConstants.registrationUrl}");
+    print("Request Data: $data");
+    
+    try {
+      final formData = FormData.fromMap(data);
+      print("FormData fields: ${formData.fields}");
+      if (data['profile_photo'] != null) {
+        print("Profile photo included in request");
+      }
+      
+      final response = await ref
+          .read(apiClientProvider)
+          .post(AppConstants.registrationUrl, data: formData);
+          
+      print("\n--------- API RESPONSE ---------");
+      print("Status: ${response.statusCode}");
+      print("Response: ${response.data}");
+      
+      return response;
+    } catch (e) {
+      print("\n--------- API ERROR ---------");
+      print("Error occurred while making registration request: $e");
+      rethrow;
+    }
   }
 
   @override

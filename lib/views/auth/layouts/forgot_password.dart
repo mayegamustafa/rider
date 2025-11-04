@@ -32,8 +32,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         backgroundColor: context.isDark ? Colors.black : AppColor.whiteColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          color: AppColor.primaryColor,
+          icon: SvgPicture.asset(
+            Assets.svgs.backArrow,
+            color: AppColor.primaryColor,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -81,20 +83,26 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     name: "phone",
                     keyboardType: TextInputType.phone,
                     decoration: AppTheme.inputDecoration.copyWith(
-                      hintText: S.of(context).enterPhoneNumber,
+                      hintText: '0700000000 or 256700000000',
+                      helperText: 'Enter Ugandan phone number',
                       hintStyle: TextStyle(
                         color: AppColor.greyColor,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    validator: FormBuilderValidators.compose(
-                      [
-                        FormBuilderValidators.required(),
-                        FormBuilderValidators.minLength(10),
-                        FormBuilderValidators.maxLength(11),
-                      ],
-                    ),
+                    validator: (value) {
+                      return PhoneValidator.validateUgandanPhone(value, context);
+                    },
+                    onEditingComplete: () {
+                      final value = _formKey.currentState?.fields['phone']?.value;
+                      if (value != null && value.isNotEmpty) {
+                        final normalizedNumber = PhoneValidator.normalizeUgandanPhone(value);
+                        if (normalizedNumber != value) {
+                          _formKey.currentState?.fields['phone']?.didChange(normalizedNumber);
+                        }
+                      }
+                    },
                   ),
                   Gap(30.h),
                   // mycustombutton
@@ -106,38 +114,52 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               child: CircularProgressIndicator(),
                             )
                           : MyCustomButton(
-                              onTap: () {
+                              onTap: () async {
                                 if (_formKey.currentState!.saveAndValidate()) {
-                                  ref
-                                      .read(sendOTPProvider.notifier)
-                                      .sendOTP(
-                                        phone: _formKey.currentState!
-                                            .fields['phone']!.value
-                                            .toString(),
-                                        isForgetPass: true,
-                                      )
-                                      .then((value) {
+                                  final phone = _formKey.currentState!.fields['phone']!.value.toString();
+                                  final normalizedPhone = PhoneValidator.normalizeUgandanPhone(phone);
+                                  
+                                  try {
+                                    final value = await ref
+                                        .read(sendOTPProvider.notifier)
+                                        .sendOTP(
+                                          phone: normalizedPhone,
+                                          isForgetPass: true,
+                                        );
+                                        
                                     if (value['success'] == true) {
-                                      context.nav.pushNamed(
-                                        Routes.confirmOTP,
-                                        arguments: ConfirmOTPScreenArguments(
-                                          phoneNumber: _formKey.currentState!
-                                              .fields['phone']!.value
-                                              .toString(),
-                                          isPasswordRecover: true,
-                                          userData: {},
-                                          otp: value['otp'],
-                                        ),
-                                      );
+                                      if (context.mounted) {
+                                        context.nav.pushNamed(
+                                          Routes.confirmOTP,
+                                          arguments: ConfirmOTPScreenArguments(
+                                            phoneNumber: normalizedPhone,
+                                            isPasswordRecover: true,
+                                            userData: {},
+                                            otp: value['otp'],
+                                          ),
+                                        );
+                                      }
                                     } else {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(value['message'] ?? 'Failed to send OTP'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  } catch (e) {
+                                    print('Send OTP error: $e');
+                                    if (context.mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
-                                          content: Text(value['message']),
+                                          content: Text('Error sending OTP: ${e.toString()}'),
                                           backgroundColor: Colors.red,
                                         ),
                                       );
                                     }
-                                  });
+                                  }
                                 }
                               },
                               btnText: S.of(context).sendOTP,

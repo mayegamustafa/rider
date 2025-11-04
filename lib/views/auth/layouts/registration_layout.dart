@@ -616,14 +616,68 @@ class _RegistrationLayoutState extends ConsumerState<RegistrationLayout> {
                             return;
                           }
                           // Directly proceed with registration
-                          final result = await ref.read(registrationProvider.notifier).registration(data: data);
-                          if (result) {
+                          // Check and validate all required fields
+                          final normalizedPhone = PhoneValidator.normalizeUgandanPhone(data["phone"]);
+                          data["phone"] = normalizedPhone;
+                          
+                          print("\n--------- REGISTRATION DATA ---------");
+                          print("First Name: ${data['first_name']}");
+                          print("Last Name: ${data['last_name']}");
+                          print("Phone: ${data['phone']}");
+                          print("Email: ${data['email']}");
+                          print("Gender: ${data['gender']}");
+                          print("Date of Birth: ${data['date_of_birth']}");
+                          print("Driving License: ${data['driving_licence']}");
+                          print("Vehicle Type: ${data['vehicle_type']}");
+                          print("Profile Photo: ${data['profile_photo']}");
+                          
+                          try {
+                            // Show loading indicator
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return Center(
+                                  child: Container(
+                                    padding: EdgeInsets.all(16.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CircularProgressIndicator(),
+                                        SizedBox(height: 16.0),
+                                        Text('Registering...')
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                            
+                            final result = await ref.read(registrationProvider.notifier).registration(data: data);
+                            
+                            // Hide loading indicator
+                            Navigator.of(context, rootNavigator: true).pop();
+                            
+                            if (result) {
+                              GlobalFunction.showCustomSnackbar(
+                                  message: "Registration successful", isSuccess: true);
+                              context.nav.pushNamedAndRemoveUntil(Routes.home, (route) => false);
+                            } else {
+                              GlobalFunction.showCustomSnackbar(
+                                  message: "Registration failed - please check all fields", isSuccess: false);
+                            }
+                          } catch (e) {
+                            // Hide loading indicator in case of error
+                            Navigator.of(context, rootNavigator: true).pop();
+                            
+                            print("\n--------- REGISTRATION ERROR ---------");
+                            print(e);
                             GlobalFunction.showCustomSnackbar(
-                                message: "Registration successful", isSuccess: true);
-                            context.nav.pushNamedAndRemoveUntil(Routes.home, (route) => false);
-                          } else {
-                            GlobalFunction.showCustomSnackbar(
-                                message: "Registration failed", isSuccess: false);
+                                message: "Registration error: ${e.toString()}", isSuccess: false);
                           }
                         } else {
                           if (image == null) {

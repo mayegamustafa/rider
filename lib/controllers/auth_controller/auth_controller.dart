@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:razinshop_rider/config/app_constants.dart';
 import 'package:razinshop_rider/services/auth_service.dart';
+import 'package:razinshop_rider/utils/phone_validator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_controller.g.dart';
@@ -18,26 +19,41 @@ class Login extends _$Login {
   Future<bool> login({required String phone, required String password}) async {
     state = true;
     try {
-      print("--------- LOGIN ATTEMPT ---------");
-      print("Phone: $phone");
-      print("Password: $password");
+      print("\n--------- LOGIN ATTEMPT ---------");
+      print("Original Phone: $phone");
+      print("Password Length: ${password.length}");
+      
+      // Normalize phone number and validate
+      final normalizedPhone = PhoneValidator.normalizeUgandanPhone(phone);
+      print("Normalized Phone: $normalizedPhone");
+      
+      if (!RegExp(r'^\+256\d{9}$').hasMatch(normalizedPhone)) {
+        print("\n--------- VALIDATION ERROR ---------");
+        print("Invalid phone number format");
+        throw Exception("Invalid phone number format. Please enter a valid Ugandan phone number.");
+      }
       
       final response = await ref
           .read(authServiceProvider)
-          .login(phone: phone, password: password);
+          .login(phone: normalizedPhone, password: password);
       
       print("\n--------- SERVER RESPONSE ---------");
       print("Status Code: ${response.statusCode}");
       print("Response Data: ${response.data}");
-      
-      print("\n--------- HEADERS ---------");
-      print("Response Headers: ${response.headers}");
       
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
         
         print("\n--------- DATA PROCESSING ---------");
         print("Raw Data: $data");
+        
+        // Check for error messages in response
+        if (data['error'] != null || 
+            (data['message']?.toString().toLowerCase().contains('invalid') ?? false)) {
+          print("\n--------- LOGIN ERROR ---------");
+          print("API Error: ${data['message'] ?? data['error']}");
+          throw Exception(data['message'] ?? data['error'] ?? "Invalid credentials");
+        }
         
         String? token = data['data']?['token'] ?? data['token'];
         print("Extracted Token: $token");
@@ -57,15 +73,21 @@ class Login extends _$Login {
           return true;
         }
       }
+      
+      // If response indicates an error
+      if (response.data?['message'] != null) {
+        throw Exception(response.data!['message']);
+      }
+      
       print("\n--------- LOGIN FAILED ---------");
       print("Reason: Invalid response structure or missing token");
-      state = false;
-      return false;
+      throw Exception("Login failed. Please check your credentials and try again.");
+      
     } catch (e) {
       print("\n--------- LOGIN ERROR ---------");
       print("Error Details: $e");
       state = false;
-      return false;
+      rethrow; // Re-throw the error to handle it in the UI
     }
   }
 }
@@ -163,27 +185,76 @@ class Registration extends _$Registration {
   Future<bool> registration({required Map<String, dynamic> data}) async {
     state = true;
     try {
+      print("\n--------- REGISTRATION ATTEMPT ---------");
+      print("Registration Data: ${data.toString()}");
+      
+      // Validate required fields
+      final requiredFields = [
+        'first_name',
+        'last_name',
+        'phone',
+        'email',
+        'gender',
+        'date_of_birth',
+        'driving_licence',
+        'vehicle_type',
+        'profile_photo'
+      ];
+
+      for (var field in requiredFields) {
+        if (!data.containsKey(field) || data[field] == null || data[field].toString().isEmpty) {
+          print('\n--------- VALIDATION ERROR ---------');
+          print('Missing or empty required field: $field');
+          state = false;
+          return false;
+        }
+      }
+
+      // Email validation
+      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(data['email'])) {
+        print('\n--------- VALIDATION ERROR ---------');
+        print('Invalid email format: ${data['email']}');
+        state = false;
+        return false;
+      }
+      
       final response = await ref
           .read(authServiceProvider)
           .registration(data: data);
       
+      print("\n--------- SERVER RESPONSE ---------");
+      print("Status Code: ${response.statusCode}");
+      print("Response Data: ${response.data}");
+      print("Response Headers: ${response.headers}");
+      
       if (response.statusCode == 200) {
-        // Store the token if provided in the response
+        print("\n--------- DATA PROCESSING ---------");
         if (response.data['data']?['token'] != null) {
           Box authBox = Hive.box(AppConstants.authBox);
+          print("Storing token: ${response.data['data']['token']}");
           authBox.put(AppConstants.authToken, response.data['data']['token']);
+          
           // Store user data if available
           if (response.data['data']?['user'] != null) {
+            print("Storing user data: ${response.data['data']['user']}");
             authBox.put(AppConstants.userData, response.data['data']['user']);
           }
+        } else {
+          print("No token found in response");
         }
+        print("\n--------- REGISTRATION SUCCESS ---------");
         state = false;
         return true;
       }
+      print("\n--------- REGISTRATION FAILED ---------");
+      print("Failed with status code: ${response.statusCode}");
+      print("Error message: ${response.data['message'] ?? 'No error message provided'}");
       state = false;
       return false;
     } catch (e) {
-      print("Registration error: $e");
+      print("\n--------- REGISTRATION ERROR ---------");
+      print("Error type: ${e.runtimeType}");
+      print("Error details: $e");
       state = false;
       return false;
     }

@@ -149,7 +149,7 @@ class _BottomSectionState extends ConsumerState<BottomSection> {
       );
     } else if (status == 'Delivered') {
       await successStatus(status);
-      ref.read(userDetilsProvider.notifier).build();
+      ref.read(userDetailsProvider.notifier).build();
       ref.read(slideButtonLeftPosition.notifier).state = 328.w - 48.r;
       ref.read(slideButtonComplete.notifier).state = true;
     } else {

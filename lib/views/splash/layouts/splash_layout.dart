@@ -42,7 +42,7 @@ class _SplashLayoutState extends ConsumerState<SplashLayout> {
 
       if (checkStatus == null) {
         if (authBox.get(AppConstants.authToken) != null) {
-          ref.read(userDetilsProvider);
+          ref.read(userDetailsProvider);
           context.nav.pushNamedAndRemoveUntil(Routes.home, (route) => false);
         } else {
           Navigator.pushReplacement(

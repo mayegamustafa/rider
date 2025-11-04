@@ -18,16 +18,29 @@ class Login extends _$Login {
   Future<bool> login({required String phone, required String password}) async {
     state = true;
     try {
-      print("Attempting login with phone: $phone"); // Debug log
+      print("--------- LOGIN ATTEMPT ---------");
+      print("Phone: $phone");
+      print("Password: $password");
+      
       final response = await ref
           .read(authServiceProvider)
           .login(phone: phone, password: password);
       
-      print("Login Response: ${response.data}"); // Debug log
+      print("\n--------- SERVER RESPONSE ---------");
+      print("Status Code: ${response.statusCode}");
+      print("Response Data: ${response.data}");
+      
+      print("\n--------- HEADERS ---------");
+      print("Response Headers: ${response.headers}");
       
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
+        
+        print("\n--------- DATA PROCESSING ---------");
+        print("Raw Data: $data");
+        
         String? token = data['data']?['token'] ?? data['token'];
+        print("Extracted Token: $token");
         
         if (token != null) {
           Box authBox = Hive.box(AppConstants.authBox);
@@ -35,18 +48,22 @@ class Login extends _$Login {
           
           // Store user data
           final userData = data['data'] ?? data;
+          print("User Data to Store: $userData");
           authBox.put(AppConstants.userData, userData);
           
-          print("Login successful. Token stored."); // Debug log
+          print("\n--------- LOGIN SUCCESS ---------");
+          print("Token and User Data stored successfully");
           state = false;
           return true;
         }
       }
-      print("Login failed. Invalid response structure."); // Debug log
+      print("\n--------- LOGIN FAILED ---------");
+      print("Reason: Invalid response structure or missing token");
       state = false;
       return false;
     } catch (e) {
-      print("Login error: $e");
+      print("\n--------- LOGIN ERROR ---------");
+      print("Error Details: $e");
       state = false;
       return false;
     }

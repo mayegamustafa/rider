@@ -121,7 +121,9 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
               validator: (value) {
                 return PhoneValidator.validateUgandanPhone(value, context);
               },
-              onChanged: (value) {
+              // Using onEditingComplete instead of onChanged to avoid continuous validation
+              onEditingComplete: () {
+                final value = _formKey.currentState?.fields['phone']?.value;
                 if (value != null && value.isNotEmpty) {
                   final normalizedNumber = PhoneValidator.normalizeUgandanPhone(value);
                   if (normalizedNumber != value) {
